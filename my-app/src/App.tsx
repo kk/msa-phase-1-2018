@@ -4,147 +4,147 @@
 //import MenuItem from '@material-ui/icons/MenuItem';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+
+//import blue from '@material-ui/core/colors/blue';
 
 import * as React from 'react';
 
 //import Loader from 'react-loader-spinner';
 import './App.css';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      // light: will be calculated from palette.primary.main,
+      main: '#ff4400',
+      // dark: will be calculated from palette.primary.main,
+      // contrastText: will be calculated to contrast with palette.primary.main
+    },
+    secondary: {
+      light: '#0066ff',
+      main: '#0044ff',
+      // dark: will be calculated from palette.secondary.main,
+      contrastText: '#ffcc00',
+    },
+    // error: will use the default color
+  },
+  typography: {
+    // Use the system font instead of the default Roboto font.
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  },
+});
 
-//const urlPath = username =>
- // `https://api.github.com/users/${username}`
-
- interface IState {
-  //imageFiles: any[],
-  //results: any
-  //dropzone: any
+interface IState {
   username: string,
-  returnValue: any
-} 
+  returnValue: any,
+}
 
 export default class App extends React.Component<{}, IState> {
-//export default class App extends React.Component<{}> {
-
   constructor(props: any) {
     super(props)
     this.state = {
-     // imageFiles: [],
-     // results: "",
-     // dropzone: this.onDrop.bind(this)
-     username: "",
-     returnValue: ""
+      username: "kk",
+      returnValue: "",
     }
   }
 
-/*   public onDrop(files: any) {
-    this.setState({
-      imageFiles: files,
-      results: ""
-    })
-    const file = files[0]
-    const reader = new FileReader();
-    reader.onload = (readerEvt) => {
-        const binaryString = readerEvt.target!!.result; // !! checks if not null
-        this.upload(btoa(binaryString)) // converts binary string to base64 to make the string smaller to send to the server
-    };
-
-    reader.readAsBinaryString(file);
-  }
- */
-public search(){
-  fetch("https://api.github.com/users/" + this.state.username).then(d=>d.json())
-  //fetch(urlPath(this.props.username)).then(d=>d.json())
-  .then(d=> {
-    this.setState({
-      returnValue: d
-    })
-  })
-}
-
-/*   public upload(base64String: string) {
-    fetch('http://api.open-notify.org/iss-now.json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-      body: JSON.stringify({
-        file: base64String,
+  public search(user: String) {
+    fetch("https://api.github.com/users/" + user).then(d => d.json())
+      .then(d => {
+        this.setState({
+          returnValue: d
+        })
       })
-    })
-    .then((response : any) => { // callback function
-      if (!response.ok) {
-        this.setState({results: response.statusText})
-      }
-      else {
-        response.json().then((data:any) => this.setState({results: data[0].class}))
-      }
-      return response
-    })
-  } */
+  }
+
+  public changeState() {
+    this.search((document.getElementById("name") as HTMLInputElement).value);
+  }
 
   public render() {
-    {this.search()}
+    if (this.state.returnValue == "") {
+      return (
+        <MuiThemeProvider theme={theme}>
+          <h3 style={{ textAlign: "center" }}> Find out more about a Github user by entering a name below! </h3>
+          <div style={{ textAlign: "center" }}>
+            <TextField id="name" label="Name" />
+            <Button variant="contained" style={{ textAlign: "center" }} color="primary" onClick={e => this.search((document.getElementById("name") as HTMLInputElement).value)}
+            > Check user </Button>
+          </div>
+        </MuiThemeProvider>
+      );
+    }
+    if (this.state.returnValue.message == "Not Found") { /* when the username does not exist */
+      return (
+        <MuiThemeProvider theme={theme}>
+          <h3 style={{ textAlign: "center" }}> Username does not exist. Find another Github user below! </h3>
+          <div style={{ textAlign: "center" }}>
+            <TextField id="name" label="Name" />
+            <Button variant="contained" style={{ textAlign: "center" }} color="primary" onClick={e => this.search((document.getElementById("name") as HTMLInputElement).value)}
+            > Check user </Button>
+          </div>
+        </MuiThemeProvider>
 
-    if (!this.state.returnValue) return (
-
-    <div className = "Button">
-        <h2> no data entered! </h2> 
-    <Button variant="contained" color="primary"> Check user </Button>
-    
-    </div>
-    
-    ) 
-    if (this.state.returnValue.message) return (/* Rate limit message (max of 60 reqests per hour)  */
+      );
+    }
+    if (this.state.returnValue.message && this.state.returnValue.documentation_url == ("https://developer.github.com/v3/#rate-limiting")) return (/* Rate limit message (max of 60 reqests per hour)  */
       <h2>{this.state.returnValue.message}</h2>
     )
     return (
-      <div className="container-fluid">
-        <div className="centreText">
-{/*           <div className="dropZone">
-            <Dropzone onDrop={this.state.dropzone} style={{position: "relative"}}>
-              <div style={{height: '50vh'}}>
-                {
-                  this.state.imageFiles.length > 0 ? 
-                    <div>{this.state.imageFiles.map((file) => <img className="image" key={file.name} src={file.preview} /> )}</div> :
-                    <p>Try dropping some files here, or click to select files to upload.fghjk</p>
-                }  
-              </div>
-            </Dropzone> */}
+      <MuiThemeProvider theme={theme}>
+        <div className="container-fluid">
+          <div className="centreText">
           </div>
-          <h2>{this.state.returnValue.name}
-          <img src={this.state.returnValue.avatar_url} alt="Smiley face" height="250" width="250">
-            </img>
-            <br></br>
-              profile url: {this.state.returnValue.html_url}
-              <br></br>
-              profile creation date: {this.state.returnValue.created_at}
-              <br></br>
-              last repo update: {this.state.returnValue.updated_at}
-          </h2>
-          <h2> Check another user! </h2> 
-          <div id = "userInput">
-{/*            <TextField id="name" label="Name" value={this.state.username} onChange={e => this.setState({ username: e.target.value, returnValue: "" }) }/>
- */}          {/* <input type="text" id="inputField"></input> */}
-            <TextField id="name" label="Name" />
+          <div id="details">
+            <a href={this.state.returnValue.html_url}>
+              <img src={this.state.returnValue.avatar_url} height="225" width="225"></img>
+            </a>
+            <Typography variant="display3" gutterBottom>{this.state.returnValue.login}</Typography>
+            <Typography variant="headline" gutterBottom>{this.state.returnValue.name}</Typography>
 
-          <Button variant="contained" color="primary" onClick={() => {
-            this.setState( {
-              username: (document.getElementById("name") as HTMLInputElement).value,
-              returnValue: ""
-            })
-            //console.log( (document.getElementById("name") as HTMLInputElement).value ) 
-          }
-          }> Check user </Button> 
+            <List component="info" style={{ margin: "1px" }}>
+              <ListItem button style={{ width: "30%" }} >
+                <a href={this.state.returnValue.html_url}>
+                <ListItemText primary={"profile url: " + (this.state.returnValue.html_url)} style={{fontSize: "13px" }} />
+                </a>
+              </ListItem>
+              <ListItem button style={{ width: "30%" }} >
+                <ListItemText primary={"followers: " + (this.state.returnValue.followers)} />
+              </ListItem>
+              <ListItem button style={{ width: "30%" }}>
+                <ListItemText primary={"profile creation date: " + (this.state.returnValue.created_at)} />
+              </ListItem>
+              <ListItem button style={{ width: "30%" }}>
+                <ListItemText primary={"last repo update: " + (this.state.returnValue.updated_at)} />
+              </ListItem>
+            </List>
           </div>
-{/*           <div  className="dank">
-          {
-            this.state.results === "" && this.state.imageFiles.length > 0 ?   
-            <CircularProgress thickness={3} /> :
-            <p>{this.state.results}</p>
-          }
-          </div> */}
         </div>
-      //</div>
+        <br></br>
+        <hr></hr>
+        <h3 style={{ textAlign: "center" }}> Find out more about a Github user by entering a name below! </h3>
+        <div style={{ textAlign: "center", paddingBottom: "3%" }}>
+          <TextField id="name" label="Name" />
+          <Button variant="contained" style={{ textAlign: "center" }} color="primary" onClick={e => this.search((document.getElementById("name") as HTMLInputElement).value)}
+          > Check user </Button>
+        </div>
+      </MuiThemeProvider>
     );
   }
 }

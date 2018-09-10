@@ -3,3 +3,23 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+img {
+  border-radius: 50%;
+}
+
+#details{
+  padding-left: 40%
+}
+
+h2{
+  padding-left: 10px;
+}
+
+input{
+  margin-left: 40%;
+}
+
+img{
+  margin-top: 5%;
+}
